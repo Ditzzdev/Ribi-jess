@@ -1,0 +1,713 @@
+<!doctype doctype>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forest Quest TKJ</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a4d2e 0%, #2d5a3d 50%, #1f3a29 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    /* Animated Forest Background */
+    .forest-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .tree {
+      position: absolute;
+      bottom: 0;
+      opacity: 0.15;
+      animation: sway 4s ease-in-out infinite;
+    }
+
+    .tree:nth-child(1) { left: 5%; width: 80px; animation-delay: 0s; }
+    .tree:nth-child(2) { left: 25%; width: 100px; animation-delay: 0.5s; }
+    .tree:nth-child(3) { left: 45%; width: 70px; animation-delay: 1s; }
+    .tree:nth-child(4) { left: 65%; width: 90px; animation-delay: 1.5s; }
+    .tree:nth-child(5) { right: 5%; width: 85px; animation-delay: 2s; }
+
+    @keyframes sway {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      50% { transform: translateX(10px) rotate(2deg); }
+    }
+
+    /* Floating Particles */
+    .particle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 15s infinite ease-in-out;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100%) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100%) translateX(100px); opacity: 0; }
+    }
+
+    /* Main Container */
+    .game-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Glass Card Effect */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+      transform: translateY(-5px);
+    }
+
+    /* Header */
+    .game-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .game-title {
+      font-size: 48px;
+      color: #fff;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .game-subtitle {
+      font-size: 18px;
+      color: #a8e6cf;
+      margin: 0;
+    }
+
+    /* Score Display */
+    .score-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .score-item {
+      text-align: center;
+    }
+
+    .score-label {
+      color: #a8e6cf;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-value {
+      color: #fff;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      text-align: center;
+    }
+
+    .welcome-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .welcome-text {
+      color: #fff;
+      font-size: 24px;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: white;
+      border: none;
+      padding: 18px 45px;
+      font-size: 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(76, 175, 80, 0.6);
+      background: linear-gradient(135deg, #45a049 0%, #4caf50 100%);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    /* Quiz Screen */
+    .quiz-screen {
+      display: none;
+    }
+
+    .question-container {
+      margin-bottom: 30px;
+    }
+
+    .question-number {
+      color: #a8e6cf;
+      font-size: 16px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question-text {
+      color: #fff;
+      font-size: 24px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      font-weight: 500;
+    }
+
+    .options-container {
+      display: grid;
+      gap: 15px;
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 20px 25px;
+      font-size: 16px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .option-btn:hover::before {
+      left: 100%;
+    }
+
+    .option-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #4caf50;
+      transform: translateX(10px);
+    }
+
+    .option-btn.correct {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: #4caf50;
+      animation: correctPulse 0.5s;
+    }
+
+    .option-btn.wrong {
+      background: rgba(244, 67, 54, 0.3);
+      border-color: #f44336;
+      animation: wrongShake 0.5s;
+    }
+
+    .option-btn.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Result Screen */
+    .result-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .result-icon {
+      font-size: 100px;
+      margin-bottom: 20px;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .result-title {
+      color: #fff;
+      font-size: 36px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .result-stats {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 30px 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .result-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .result-stat:last-child {
+      border-bottom: none;
+    }
+
+    .result-stat-label {
+      color: #a8e6cf;
+      font-size: 18px;
+    }
+
+    .result-stat-value {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+      margin-left: 15px;
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 8px 30px rgba(33, 150, 243, 0.6);
+      background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 36px;
+      }
+
+      .glass-card {
+        padding: 25px;
+      }
+
+      .question-text {
+        font-size: 20px;
+      }
+
+      .btn {
+        padding: 15px 35px;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body><!-- Animated Background -->
+  <div class="forest-bg">
+   <svg class="tree" viewbox="0 0 100 150"><polygon points="50,20 30,60 70,60" fill="#2d5a3d" /> <polygon points="50,40 25,80 75,80" fill="#1a4d2e" /> <rect x="45" y="80" width="10" height="30" fill="#3e2723" />
+   </svg>
+   <svg class="tree" viewbox="0 0 100 150"><polygon points="50,20 30,60 70,60" fill="#2d5a3d" /> <polygon points="50,40 25,80 75,80" fill="#1a4d2e" /> <rect x="45" y="80" width="10" height="30" fill="#3e2723" />
+   </svg>
+   <svg class="tree" viewbox="0 0 100 150"><polygon points="50,20 30,60 70,60" fill="#2d5a3d" /> <polygon points="50,40 25,80 75,80" fill="#1a4d2e" /> <rect x="45" y="80" width="10" height="30" fill="#3e2723" />
+   </svg>
+   <svg class="tree" viewbox="0 0 100 150"><polygon points="50,20 30,60 70,60" fill="#2d5a3d" /> <polygon points="50,40 25,80 75,80" fill="#1a4d2e" /> <rect x="45" y="80" width="10" height="30" fill="#3e2723" />
+   </svg>
+   <svg class="tree" viewbox="0 0 100 150"><polygon points="50,20 30,60 70,60" fill="#2d5a3d" /> <polygon points="50,40 25,80 75,80" fill="#1a4d2e" /> <rect x="45" y="80" width="10" height="30" fill="#3e2723" />
+   </svg>
+  </div>
+  <div class="game-container">
+   <div class="glass-card"><!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+     <div class="game-header">
+      <h1 class="game-title">🌲 Forest Quest TKJ</h1>
+      <p class="game-subtitle">Petualangan Belajar Teknik Komputer Jaringan</p>
+     </div>
+     <div class="welcome-icon">
+      🎮
+     </div>
+     <p class="welcome-text">Selamat datang di Forest Quest! Uji pengetahuan TKJ kamu melalui<br>
+       15 pertanyaan menantang tentang dasar-dasar jaringan komputer.</p><button class="btn" onclick="startQuiz()">Mulai Petualangan</button>
+    </div><!-- Quiz Screen -->
+    <div class="quiz-screen" id="quizScreen">
+     <div class="game-header">
+      <h1 class="game-title">🌲 Forest Quest TKJ</h1>
+     </div>
+     <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+     </div>
+     <div class="score-container">
+      <div class="score-item">
+       <div class="score-label">
+        Pertanyaan
+       </div>
+       <div class="score-value" id="questionCounter">
+        1/15
+       </div>
+      </div>
+      <div class="score-item">
+       <div class="score-label">
+        Score
+       </div>
+       <div class="score-value" id="currentScore">
+        0
+       </div>
+      </div>
+     </div>
+     <div class="question-container">
+      <div class="question-number" id="questionNumber">
+       Pertanyaan 1
+      </div>
+      <div class="question-text" id="questionText"></div>
+     </div>
+     <div class="options-container" id="optionsContainer"></div>
+    </div><!-- Result Screen -->
+    <div class="result-screen" id="resultScreen">
+     <div class="result-icon" id="resultIcon">
+      🏆
+     </div>
+     <h2 class="result-title" id="resultTitle">Selamat!</h2>
+     <div class="result-stats">
+      <div class="result-stat"><span class="result-stat-label">Total Score</span> <span class="result-stat-value" id="finalScore">0</span>
+      </div>
+      <div class="result-stat"><span class="result-stat-label">Jawaban Benar</span> <span class="result-stat-value" id="correctAnswers">0</span>
+      </div>
+      <div class="result-stat"><span class="result-stat-label">Jawaban Salah</span> <span class="result-stat-value" id="wrongAnswers">0</span>
+      </div>
+      <div class="result-stat"><span class="result-stat-label">Persentase</span> <span class="result-stat-value" id="percentage">0%</span>
+      </div>
+     </div><button class="btn" onclick="restartQuiz()">Main Lagi</button>
+    </div>
+   </div>
+  </div>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const particleCount = 20;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+        document.body.appendChild(particle);
+      }
+    }
+
+    createParticles();
+
+    // Quiz Questions Database
+    const quizData = [
+      {
+        question: "Apa kepanjangan dari TKJ?",
+        options: ["Teknik Komputer Jaringan", "Teknologi Komputer Jaringan", "Teknik Komunikasi Jaringan", "Teknologi Komunikasi Jaringan"],
+        correct: 0
+      },
+      {
+        question: "Perangkat yang berfungsi menghubungkan beberapa jaringan yang berbeda adalah?",
+        options: ["Hub", "Switch", "Router", "Bridge"],
+        correct: 2
+      },
+      {
+        question: "Topologi jaringan yang berbentuk lingkaran adalah?",
+        options: ["Star", "Bus", "Ring", "Mesh"],
+        correct: 2
+      },
+      {
+        question: "IP Address 192.168.1.1 termasuk dalam kelas?",
+        options: ["Kelas A", "Kelas B", "Kelas C", "Kelas D"],
+        correct: 2
+      },
+      {
+        question: "Kabel yang menggunakan cahaya sebagai media transmisi adalah?",
+        options: ["UTP", "STP", "Coaxial", "Fiber Optic"],
+        correct: 3
+      },
+      {
+        question: "Protokol yang digunakan untuk mengirim email adalah?",
+        options: ["HTTP", "FTP", "SMTP", "POP3"],
+        correct: 2
+      },
+      {
+        question: "Subnet mask default untuk kelas C adalah?",
+        options: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"],
+        correct: 2
+      },
+      {
+        question: "Perangkat yang dapat memfilter data berdasarkan MAC Address adalah?",
+        options: ["Hub", "Repeater", "Switch", "Modem"],
+        correct: 2
+      },
+      {
+        question: "Model referensi jaringan yang memiliki 7 layer adalah?",
+        options: ["TCP/IP", "OSI", "IEEE", "ANSI"],
+        correct: 1
+      },
+      {
+        question: "Port default untuk protokol HTTP adalah?",
+        options: ["21", "23", "80", "443"],
+        correct: 2
+      },
+      {
+        question: "DNS berfungsi untuk?",
+        options: ["Mengamankan jaringan", "Menerjemahkan domain ke IP Address", "Mengirim email", "Mengatur bandwidth"],
+        correct: 1
+      },
+      {
+        question: "Kabel UTP kategori 5e mendukung kecepatan maksimal?",
+        options: ["10 Mbps", "100 Mbps", "1 Gbps", "10 Gbps"],
+        correct: 2
+      },
+      {
+        question: "Firewall berfungsi untuk?",
+        options: ["Mempercepat koneksi", "Melindungi jaringan dari ancaman", "Mengatur IP Address", "Menghubungkan dua jaringan"],
+        correct: 1
+      },
+      {
+        question: "DHCP berfungsi untuk?",
+        options: ["Mengamankan jaringan", "Memberikan IP Address otomatis", "Menerjemahkan domain", "Mengirim data"],
+        correct: 1
+      },
+      {
+        question: "Perangkat yang memperkuat sinyal dalam jaringan adalah?",
+        options: ["Router", "Switch", "Repeater", "Bridge"],
+        correct: 2
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+
+    const defaultConfig = {
+      game_title: "🌲 Forest Quest TKJ",
+      welcome_message: "Selamat datang di Forest Quest! Uji pengetahuan TKJ kamu melalui\n15 pertanyaan menantang tentang dasar-dasar jaringan komputer."
+    };
+
+    function startQuiz() {
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('quizScreen').style.display = 'block';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion >= quizData.length) {
+        showResults();
+        return;
+      }
+
+      const question = quizData[currentQuestion];
+      const progress = ((currentQuestion + 1) / quizData.length) * 100;
+      
+      document.getElementById('progressFill').style.width = progress + '%';
+      document.getElementById('questionCounter').textContent = `${currentQuestion + 1}/${quizData.length}`;
+      document.getElementById('questionNumber').textContent = `Pertanyaan ${currentQuestion + 1}`;
+      document.getElementById('questionText').textContent = question.question;
+      document.getElementById('currentScore').textContent = score;
+
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+
+      question.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => selectAnswer(index);
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    function selectAnswer(selected) {
+      const question = quizData[currentQuestion];
+      const buttons = document.querySelectorAll('.option-btn');
+      
+      buttons.forEach(btn => btn.classList.add('disabled'));
+
+      if (selected === question.correct) {
+        buttons[selected].classList.add('correct');
+        score += 100;
+        correctCount++;
+      } else {
+        buttons[selected].classList.add('wrong');
+        buttons[question.correct].classList.add('correct');
+        wrongCount++;
+      }
+
+      setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+      }, 1500);
+    }
+
+    function showResults() {
+      document.getElementById('quizScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'block';
+
+      const percentage = Math.round((correctCount / quizData.length) * 100);
+
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('correctAnswers').textContent = correctCount;
+      document.getElementById('wrongAnswers').textContent = wrongCount;
+      document.getElementById('percentage').textContent = percentage + '%';
+
+      let icon = '🏆';
+      let title = 'Luar Biasa!';
+
+      if (percentage >= 80) {
+        icon = '🏆';
+        title = 'Sempurna! Master TKJ!';
+      } else if (percentage >= 60) {
+        icon = '🌟';
+        title = 'Bagus Sekali!';
+      } else if (percentage >= 40) {
+        icon = '👍';
+        title = 'Lumayan!';
+      } else {
+        icon = '💪';
+        title = 'Tetap Semangat!';
+      }
+
+      document.getElementById('resultIcon').textContent = icon;
+      document.getElementById('resultTitle').textContent = title;
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      
+      document.getElementById('resultScreen').style.display = 'none';
+      document.getElementById('welcomeScreen').style.display = 'block';
+    }
+
+    // Element SDK Implementation
+    async function onConfigChange(config) {
+      const titleElements = document.querySelectorAll('.game-title');
+      titleElements.forEach(el => {
+        el.textContent = config.game_title || defaultConfig.game_title;
+      });
+
+      const welcomeTextEl = document.querySelector('.welcome-text');
+      if (welcomeTextEl) {
+        welcomeTextEl.textContent = config.welcome_message || defaultConfig.welcome_message;
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["welcome_message", config.welcome_message || defaultConfig.welcome_message]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a6b7b58e5929cd4',t:'MTc2NDUxNzYzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
